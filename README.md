@@ -1,138 +1,60 @@
 # KTM DUKE 390 — MIDNIGHT RACING EXPERIENCE (APEXOR)
+### SCROLLTIDE-INSPIRED EDITORIAL MOTORCYCLE EXPERIENCE
 
-A premium, photorealistic, cinematic 3D scrollytelling website for the **KTM DUKE 390** motorcycle.
+A premium, photorealistic, cinematic 3D scrollytelling website for the **KTM DUKE 390** motorcycle, designed with inspiration from [Scrolltide](https://www.scrolltide.co/) editorial layouts and motion architecture.
 
-Built strictly according to master specifications using **vanilla HTML5 Canvas, CSS3, and JavaScript** with zero external animation frameworks, zero npm dependencies, and full VS Code Live Server compatibility.
+Built using **vanilla HTML5 Canvas, CSS3, and JavaScript** with zero external animation frameworks, zero npm dependencies, and full VS Code Live Server compatibility.
 
 ---
 
-## 1. Project Overview & Visual Identity
+## 1. Architectural Highlights & Scrolltide Influences
 
-- **Brand Identity:** KTM DUKE 390
-- **Visual Identity:** MIDNIGHT NAVY (`#0B1B35`) × RACING ORANGE (`#FF6600`)
-- **Atmosphere:** Blacked-out futuristic city at night, wet reflective asphalt, cutting LED headlights, and precision mechanical engineering.
-- **Strict Visual Rules Adhered To:**
-  - Solid flat colours and thin hairline borders.
-  - No gradients of any kind (no linear, radial, or conic gradients).
-  - No glassmorphism, no backdrop-filter, no frosted panels.
-  - No emojis or bubbly rounded cards.
+- **Asymmetrical Split Hero Experience:**
+  - Left panel: `KTM MOTORCYCLE EXPERIENCE` mono tag, colossal display typography `UNLEASH THE DARK`, orange CTA `EXPLORE DUKE 390`, telemetry strip (`0–100 IN 4.8S · 44.2 HP · TRELLIS`), and ride prompt.
+  - Right panel: High-resolution hardware-accelerated canvas showcasing the photorealistic KTM Duke 390 in deep midnight navy atmosphere with wet asphalt reflections.
+  - Transitions into full-screen cinematic tracking film with real-time HUD telemetry.
+- **Horizontal Scrolling Fleet Gallery (`350vh` Pinned Track):**
+  - Horizontal translation driven by vertical scroll progress.
+  - Interactive cards for all 5 models (Duke 390, Duke 250, Duke 200, RC 390, Adventure 390) with hover zooms, 4-metric spec grids, swatches, and direct configuration links.
+  - Navigation controls: `[← PREV]`, `[NEXT →]`, active dot indicators, and `AUTO-TOUR ALL MODELS` mode.
+- **Exploded Mechanical Engineering (`350vh` Pinned Track):**
+  - 80-frame technical deconstruction of all 26 components.
+  - 4 callouts (`FRAME`, `ENGINE`, `SUSPENSION`, `LIGHT`) revealed past 70% progress.
+  - Tap-to-dismantle / reassemble auto-run engine.
+  - Expandable 4-card technical deep-dive grid beneath.
+- **Full-Width Parallax Feature Band:**
+  - Editorial canyon shot with parallax scaling, bold typography (`ENGINEERED TO CUT THE NIGHT`), and chassis telemetry pills.
+- **Interactive Acquisition Portal:**
+  - Live model preview frame with tab-swapping (`[DUKE 390]`, `[DUKE 250]`, etc.) and allocation drawer.
+- **Strict Visual Rules Upheld:**
+  - Zero gradients of any kind (solid flat colors only).
+  - Zero glassmorphism or `backdrop-filter`.
   - Minimal editorial typography (Archivo, Inter, JetBrains Mono).
 
 ---
 
-## 2. Technical Stack
+## 2. Colour System
 
-- **HTML5 Canvas:** High-performance hardware-accelerated 2D canvas with DPR capped at 2, cover-fit on desktop landscape, contain-fit on mobile portrait.
-- **CSS3:** Strict color token system, variable font styling, responsive layout, global easing curve `cubic-bezier(0.16, 1, 0.3, 1)`.
-- **Vanilla JavaScript:** 60fps `requestAnimationFrame` render loop, lerp frame interpolation, progressive multi-stage asset preloader, touch & keyboard accessible interactive accordion.
-- **Asset Pipeline:** Python Pillow & OpenCV automated WebP pipeline producing 1600px desktop (quality 78) and 960px mobile (quality 72) frame sequences.
-
----
-
-## 3. Directory Structure
-
-```text
-c:\Users\alapa\Desktop\bike\
-├── index.html                  # Master semantic HTML document
-├── styles.css                  # Master CSS token and layout system
-├── main.js                     # Core application engine and canvas scrollyteller
-├── config.js                   # Centralized configuration object
-│
-├── assets/
-│   ├── frames/
-│   │   ├── hero/               # 120 desktop WebP frames (1600x900, q78)
-│   │   ├── hero-mobile/        # 120 mobile WebP frames (960x540, q72)
-│   │   ├── dismantle/          # 80 desktop WebP frames (1600x900, q78)
-│   │   └── dismantle-mobile/   # 80 mobile WebP frames (960x540, q72)
-│   │
-│   ├── bikes/
-│   │   ├── duke-390.webp       # 01 — Duke 390 Hero Side Profile (1600x900)
-│   │   ├── duke-250.webp       # 02 — Duke 250 Streetfighter (1600x900)
-│   │   ├── duke-200.webp       # 03 — Duke 200 Street Aggression (1600x900)
-│   │   ├── rc-390.webp         # 04 — RC 390 Supersport Racing (1600x900)
-│   │   └── adventure-390.webp  # 05 — Adventure 390 Touring (1600x900)
-│   │
-│   └── textures/
-│       └── noise.png           # Shifting film grain texture buffer
-│
-├── generate_assets.py          # Python asset pipeline script
-└── README.md                   # Complete architectural documentation
-```
+- **Midnight Navy:** `#0B1B35`
+- **Deep Background / Asphalt:** `#070B16`
+- **KTM Orange:** `#FF6600`
+- **Light Orange:** `#FF8533`
+- **Bone White:** `#F1F3F7`
+- **Fog Grey:** `#8996A8`
+- **Xenon Blue:** `#CFE3FF`
+- **Taillight Red:** `#E1251B`
+- **Hairline:** `rgba(207, 227, 255, 0.16)`
 
 ---
 
-## 4. Asset Audit Report
-
-Generated using Pillow and OpenCV WebP encoders:
-
-| Directory | Files | Resolution | Format & Quality | Total Size |
-|---|---:|:---:|:---:|---:|
-| `assets/frames/hero/` | 120 | 1600 × 900 | WebP Q78 | 4.84 MB |
-| `assets/frames/hero-mobile/` | 120 | 960 × 540 | WebP Q72 | 1.95 MB |
-| `assets/frames/dismantle/` | 80 | 1600 × 900 | WebP Q78 | 7.86 MB |
-| `assets/frames/dismantle-mobile/` | 80 | 960 × 540 | WebP Q72 | 3.36 MB |
-| `assets/bikes/` | 5 | 1600 × 900 | WebP Q85 | 0.37 MB |
-| `assets/textures/` | 1 | 256 × 256 | PNG | 0.06 MB |
-| **Total Media Assets** | **406** | — | — | **18.44 MB** |
-
----
-
-## 5. Key Architecture Features
-
-### A. Preloader
-- Midnight Navy backdrop (`#0B1B35`) with precision mono percentage counter (`000%` → `100%`).
-- Loads first 40 frames of the Hero sequence, flashes a bright xenon pulse, and seamlessly reveals the website while loading remaining frames asynchronously.
-
-### B. Section 01: Hero Scrollytelling (600vh)
-- Continuous automotive sequence:
-  - **Scene 1 (0–18%):** Stationary motorcycle in dark misty city, headlights beaming through fog.
-  - **Scene 2 (22–42%):** Accelerating away down the wet avenue.
-  - **Scene 3 & 4 (48–70%):** Sweeping camera move alongside rear three-quarter angle in skyscraper canyon.
-  - **Scene 5 (78–95%):** Perfect side-profile hero shot.
-  - **Outro (95–100%):** Seamless fade to solid midnight navy.
-- Real-time HUD Telemetry:
-  - Sequence chapter counter (`01/04` → `04/04`)
-  - Velocity counter (`000` → `118 KM/H`)
-  - Distance counter (`0.0` → `4.2 KM`)
-  - Transmission gear indicator (`N`, `1`, `2`, `3`, `4`, `5`)
-- Bottom 1px Xenon progress line filling in sync with scroll progress.
-
-### C. Section 02: Engineering Statement (100vh)
-- Editorial typographic showcase: *"Every part was designed to disappear into one line of light."*
-- Scroll-driven progressive opacity reveal from 15% to 100%, highlighting signature KTM orange terms.
-
-### D. Section 03: Exploded Motorcycle Engineering (350vh)
-- 3D exploded engineering visualization of the exact KTM Duke 390 separating into 26 mechanical components along straight orthogonal axes upon scrolling down, and reassembling upon scrolling up.
-- Sequential callouts after 70% scroll progress:
-  - **FRAME:** Lightweight orange steel trellis frame.
-  - **ENGINE:** Liquid-cooled single-cylinder engine.
-  - **SUSPENSION:** Precision-tuned WP suspension system.
-  - **LIGHT:** Aggressive LED headlight signature.
-
-### E. Section 04: Interactive Motorcycle Lineup (100vh)
-- Interactive 5-slide vertical accordion (Duke 390, Duke 250, Duke 200, RC 390, Adventure 390).
-- Duke 390 open by default. Closed slides compressed to 12vw with 90° rotated titles, 25% brightness grayscale.
-- Open slide expands to 52vw with full color rendering, common 72% floor line, 3-column mono specs, colour swatches, and configure CTA.
-- Desktop 80ms hover debounce, mobile tap accordion with 72px collapsed height, full keyboard accessibility (`ArrowLeft`, `ArrowRight`, `Enter`).
-
-### F. Section 05: Reservation Portal (100vh)
-- High-contrast minimal acquisition portal with KTM orange button hover and red indicator tick.
-- Functional modal allocation form with model selector and instant submission feedback.
-
-### G. Custom Headlight Cursor
-- Desktop-only fine-pointer custom cursor: 6px xenon dot with 28px ring, morphing into a 44×2px LED bar with mono contextual tags (`VIEW`, `RESERVE`, `OPEN`, `CONFIGURE`).
-
-### H. Accessibility & Motion Sensitivity
-- Fully respects `prefers-reduced-motion` by unlocking sticky wrappers into static editorial keyframes and disabling cursor transforms.
-
----
-
-## 6. How to Run
+## 3. How to Run Locally
 
 1. Open this directory in VS Code:
    ```bash
    code .
    ```
-2. Start **Live Server** (click "Go Live" on status bar or right-click `index.html` → "Open with Live Server").
-3. Experience the website at `http://127.0.0.1:5500/index.html`.
-
+2. Start Live Server or run Python HTTP server:
+   ```bash
+   python -m http.server 5500
+   ```
+3. Visit [http://localhost:5500/index.html](http://localhost:5500/index.html).

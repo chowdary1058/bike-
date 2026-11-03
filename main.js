@@ -1,13 +1,12 @@
 /**
- * KTM DUKE 390 — MIDNIGHT RACING EXPERIENCE
- * Core Application Engine
+ * KTM DUKE 390 — MIDNIGHT RACING EXPERIENCE (APEXOR)
+ * SCROLLTIDE-INSPIRED CORE ENGINE
  * Vanilla JavaScript implementation fulfilling all technical & cinematic specifications.
  */
 
 (function () {
   'use strict';
 
-  // Quick sanity check for configuration
   const cfg = window.CONFIG;
   if (!cfg) {
     console.error('FATAL: config.js must be loaded before main.js');
@@ -40,9 +39,9 @@
 
     // Lineup
     activeLineupIndex: cfg.lineup.defaultActiveIndex || 0,
-    lineupDebounceTimer: null,
     lineupTourActive: false,
     lineupTourTimer: null,
+    lineupProgress: 0,
 
     // Tap Auto-Run Engine
     heroAutoRun: false,
@@ -53,9 +52,7 @@
     cursorX: -100,
     cursorY: -100,
     targetCursorX: -100,
-    targetCursorY: -100,
-    isHoveringInteractive: false,
-    cursorLabelText: ''
+    targetCursorY: -100
   };
 
   /* ==========================================================================
@@ -85,6 +82,7 @@
     heroAutoRunBtn: document.getElementById('hero-autorun-btn'),
     heroAutoRunLabel: document.getElementById('hero-autorun-label'),
     heroAutoRunIcon: document.getElementById('hero-autorun-icon'),
+    heroQuickAutoRunBtn: document.getElementById('hero-quick-autorun-btn'),
     hudChapter: document.getElementById('hud-chapter'),
     hudSpeed: document.getElementById('hud-speed'),
     hudDistance: document.getElementById('hud-distance'),
@@ -112,21 +110,31 @@
     calloutSuspension: document.getElementById('callout-suspension'),
     calloutLight: document.getElementById('callout-light'),
 
-    // Lineup Section
-    lineupSection: document.getElementById('lineup'),
-    lineupAccordion: document.getElementById('lineup-accordion'),
+    // Horizontal Lineup Section
+    lineupWrapper: document.getElementById('lineup'),
+    horizontalTrackContainer: document.getElementById('horizontal-track-container'),
+    horizontalTrack: document.getElementById('horizontal-track'),
+    lineupHorizontalProgress: document.getElementById('lineup-horizontal-progress'),
+    lineupPrevBtn: document.getElementById('lineup-prev-btn'),
+    lineupNextBtn: document.getElementById('lineup-next-btn'),
+    lineupDotsContainer: document.getElementById('lineup-dots'),
     lineupAutoTourBtn: document.getElementById('lineup-autotour-btn'),
     lineupTourLabel: document.getElementById('lineup-tour-label'),
 
-    // Reservation & Modal
+    // Reservation & Tabs
+    reservationPreviewImg: document.getElementById('reservation-preview-img'),
+    reservationTabs: document.querySelectorAll('.res-tab'),
     reserveCta: document.getElementById('reserve-cta'),
     modal: document.getElementById('reservation-modal'),
     modalClose: document.getElementById('modal-close'),
-    reservationForm: document.getElementById('reservation-form')
+    reservationForm: document.getElementById('reservation-form'),
+
+    // Footer
+    footerClock: document.getElementById('footer-clock')
   };
 
   /* ==========================================================================
-     HELPER UTILITIES
+     UTILITIES
      ========================================================================== */
   function clamp(val, min, max) {
     return Math.max(min, Math.min(max, val));
@@ -148,10 +156,6 @@
 
   /* ==========================================================================
      1. PRELOADER & ASSET PIPELINE
-     Stage 1: Load Hero 1-40 -> Reveal page.
-     Stage 2: Background load remaining Hero (41-120).
-     Stage 3: Background load Dismantle (1-80).
-     Stage 4: Lazy load Lineup images.
      ========================================================================== */
   function initPreloader() {
     const heroCfg = state.isMobile ? cfg.hero.mobile : cfg.hero.desktop;
@@ -164,7 +168,6 @@
       if (dom.preloaderStatus && text) dom.preloaderStatus.textContent = text;
     }
 
-    // Allocate frame slots
     state.heroFrames = new Array(heroCfg.frameCount);
 
     function checkInitialReady() {
@@ -173,22 +176,18 @@
       updatePreloaderDisplay(pct, 'OPTIMIZING OPTICS [' + initialLoaded + '/' + initialBatchCount + ']');
 
       if (initialLoaded >= initialBatchCount) {
-        // Initial hero frames ready! Flare and reveal page
         if (dom.preloaderBar) dom.preloaderBar.classList.add('flare');
-        if (dom.preloaderStatus) dom.preloaderStatus.textContent = 'READY FOR TAKEOFF';
+        if (dom.preloaderStatus) dom.preloaderStatus.textContent = 'SYSTEMS LIVE // APEX READY';
 
         setTimeout(() => {
           if (dom.preloader) dom.preloader.classList.add('loaded');
-          // Trigger first canvas render
           renderHeroCanvas(0);
           renderDismantleCanvas(0);
-          // Start background loading queue
           loadRemainingHeroFrames();
-        }, 400);
+        }, 350);
       }
     }
 
-    // Load initial 40 hero frames
     for (let i = 1; i <= initialBatchCount; i++) {
       const img = new Image();
       const path = getFramePath(heroCfg.path, i, heroCfg.padLength);
@@ -199,7 +198,6 @@
         checkInitialReady();
       };
       img.onerror = () => {
-        console.warn('Failed loading hero frame:', path);
         checkInitialReady();
       };
     }
@@ -207,10 +205,7 @@
 
   function loadRemainingHeroFrames() {
     const heroCfg = state.isMobile ? cfg.hero.mobile : cfg.hero.desktop;
-    const start = 41;
-    const end = heroCfg.frameCount;
-
-    for (let i = start; i <= end; i++) {
+    for (let i = 41; i <= heroCfg.frameCount; i++) {
       const img = new Image();
       const path = getFramePath(heroCfg.path, i, heroCfg.padLength);
       img.src = path;
@@ -218,7 +213,6 @@
         state.heroFrames[i - 1] = img;
         state.heroLoadedCount++;
         if (state.heroLoadedCount >= heroCfg.frameCount) {
-          // Hero fully loaded, now load dismantle frames
           loadDismantleFrames();
         }
       };
@@ -240,7 +234,6 @@
     }
   }
 
-  /* Find nearest available loaded frame to avoid any blank flashes */
   function getNearestLoadedFrame(frames, targetIdx) {
     if (frames[targetIdx]) return frames[targetIdx];
     for (let offset = 1; offset < frames.length; offset++) {
@@ -251,7 +244,7 @@
   }
 
   /* ==========================================================================
-     2. CANVAS DRAWING ROUTINES (Cover on landscape, contain on portrait)
+     2. CANVAS DRAWING ROUTINES
      ========================================================================== */
   function drawImageFit(ctx, img, canvasW, canvasH) {
     if (!img) return;
@@ -261,7 +254,6 @@
     let renderW, renderH, offsetX, offsetY;
 
     if (isPortrait) {
-      // Contain fit on mobile / portrait to prevent cropping the motorcycle
       if (canvasRatio > imgRatio) {
         renderH = canvasH;
         renderW = canvasH * imgRatio;
@@ -270,7 +262,6 @@
         renderH = canvasW / imgRatio;
       }
     } else {
-      // Cover fit on desktop / landscape
       if (canvasRatio > imgRatio) {
         renderW = canvasW;
         renderH = canvasW / imgRatio;
@@ -320,7 +311,7 @@
   }
 
   /* ==========================================================================
-     3. FILM GRAIN SYSTEM (Shifting noise overlay ~8 fps)
+     3. FILM GRAIN
      ========================================================================== */
   function initFilmGrain() {
     if (!dom.grainCanvas) return;
@@ -329,7 +320,6 @@
     const grainW = 256;
     const grainH = 256;
 
-    // Create offscreen buffer
     const offscreen = document.createElement('canvas');
     offscreen.width = grainW;
     offscreen.height = grainH;
@@ -361,7 +351,6 @@
     renderGrain();
     window.addEventListener('resize', renderGrain);
 
-    // Shift ~8 times per second
     setInterval(() => {
       generateNoise();
       const pattern = ctx.createPattern(offscreen, 'repeat');
@@ -372,7 +361,7 @@
   }
 
   /* ==========================================================================
-     4. CUSTOM CURSOR SYSTEM — THE HEADLIGHT (Desktop Only)
+     4. CUSTOM CURSOR
      ========================================================================== */
   function initCustomCursor() {
     if (state.isMobile || state.reducedMotion || !dom.cursorDot || !dom.cursorRing) {
@@ -395,27 +384,25 @@
       }, 120);
     });
 
-    // Delegate hover detection for data-cursor or interactive elements
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('[data-cursor], a, button, [role="tab"], [role="button"]');
+      const target = e.target.closest('[data-cursor], a, button, [role="tab"], .lineup-card');
       if (target) {
         document.body.classList.add('cursor-hover');
         const label = target.getAttribute('data-cursor') ||
                      (target.tagName === 'A' ? 'VIEW' :
-                      target.tagName === 'BUTTON' ? 'OPEN' : 'SELECT');
+                      target.tagName === 'BUTTON' ? 'OPEN' : 'EXPLORE');
         if (dom.cursorLabel) dom.cursorLabel.textContent = label;
       }
     });
 
     document.addEventListener('mouseout', (e) => {
-      const target = e.target.closest('[data-cursor], a, button, [role="tab"], [role="button"]');
+      const target = e.target.closest('[data-cursor], a, button, [role="tab"], .lineup-card');
       if (target) {
         document.body.classList.remove('cursor-hover');
         if (dom.cursorLabel) dom.cursorLabel.textContent = '';
       }
     });
 
-    // Cursor animation loop
     function updateCursor() {
       state.cursorX = lerp(state.cursorX, state.targetCursorX, cfg.rendering.cursorLerp);
       state.cursorY = lerp(state.cursorY, state.targetCursorY, cfg.rendering.cursorLerp);
@@ -429,7 +416,7 @@
   }
 
   /* ==========================================================================
-     5. SECTION 01: HERO SCROLL CONTROLLER & HUD TELEMETRY
+     5. HERO SECTION & TELEMETRY
      ========================================================================== */
   function updateHeroSection() {
     if (!dom.heroWrapper) return;
@@ -437,30 +424,25 @@
     const scrollDistance = dom.heroWrapper.offsetHeight - state.viewportHeight;
     const progress = clamp(-rect.top / scrollDistance, 0, 1);
 
-    // Hero Progress Line (1px Xenon Bottom Line)
     if (dom.heroProgress) {
       dom.heroProgress.style.width = (progress * 100).toFixed(2) + '%';
     }
 
-    // Target Frame
     const heroCfg = state.isMobile ? cfg.hero.mobile : cfg.hero.desktop;
     state.heroTargetFrame = Math.round(progress * (heroCfg.frameCount - 1));
 
-    // Telemetry updates
     const currentSpeed = Math.round(progress * cfg.hero.hud.speedMax);
     const currentDist = (progress * cfg.hero.hud.distanceMax).toFixed(1);
 
     if (dom.hudSpeed) dom.hudSpeed.textContent = padNumber(currentSpeed, 3);
     if (dom.hudDistance) dom.hudDistance.textContent = currentDist;
 
-    // Gear indicator
     let activeGear = 'N';
     for (const g of cfg.hero.hud.gearMap) {
       if (progress >= g.progress) activeGear = g.gear;
     }
     if (dom.hudGear) dom.hudGear.textContent = activeGear;
 
-    // Chapter updates
     cfg.hero.chapters.forEach((chap, idx) => {
       const el = dom.heroChapters[idx];
       if (!el) return;
@@ -476,7 +458,7 @@
   }
 
   /* ==========================================================================
-     6. SECTION 02: ENGINEERING STATEMENT WORD REVEAL
+     6. EDITORIAL STATEMENT REVEAL
      ========================================================================== */
   function initEngineeringStatement() {
     if (!dom.statementWordsContainer) return;
@@ -495,8 +477,6 @@
     const rect = dom.statementSection.getBoundingClientRect();
     const windowH = state.viewportHeight;
 
-    // Calculate how far the section has progressed through the viewport
-    // Active window: from top entering to bottom leaving
     const progress = clamp((windowH - rect.top) / (windowH + rect.height * 0.5), 0, 1);
     const spans = dom.statementWordsContainer.querySelectorAll('.word-span');
     const totalWords = spans.length;
@@ -512,7 +492,7 @@
   }
 
   /* ==========================================================================
-     7. SECTION 03: DISMANTLE SECTION & TECHNICAL CALLOUTS
+     7. DISMANTLE SECTION & CALLOUTS
      ========================================================================== */
   function updateDismantleSection() {
     if (!dom.dismantleWrapper) return;
@@ -520,16 +500,13 @@
     const scrollDistance = dom.dismantleWrapper.offsetHeight - state.viewportHeight;
     const progress = clamp(-rect.top / scrollDistance, 0, 1);
 
-    // Dismantle Progress Line
     if (dom.dismantleProgress) {
       dom.dismantleProgress.style.width = (progress * 100).toFixed(2) + '%';
     }
 
-    // Target Frame
     const disCfg = state.isMobile ? cfg.dismantle.mobile : cfg.dismantle.desktop;
     state.dismantleTargetFrame = Math.round(progress * (disCfg.frameCount - 1));
 
-    // Callouts reveal sequentially after 70% progress
     const calloutMap = [
       { el: dom.calloutFrame, cfg: cfg.dismantle.callouts[0] },
       { el: dom.calloutEngine, cfg: cfg.dismantle.callouts[1] },
@@ -548,238 +525,167 @@
   }
 
   /* ==========================================================================
-     8. SECTION 04: MOTORCYCLE LINEUP ACCORDION
+     8. SCROLLTIDE HORIZONTAL SCROLLING SHOWCASE & GALLERY
      ========================================================================== */
-  function initLineupAccordion() {
-    if (!dom.lineupAccordion) return;
-    dom.lineupAccordion.innerHTML = '';
+  function initHorizontalLineup() {
+    if (!dom.horizontalTrack || !dom.lineupDotsContainer) return;
+    dom.horizontalTrack.innerHTML = '';
+    dom.lineupDotsContainer.innerHTML = '';
 
     cfg.lineup.models.forEach((bike, index) => {
-      const slide = document.createElement('article');
-      slide.className = 'lineup-slide' + (index === state.activeLineupIndex ? ' active' : '');
-      slide.setAttribute('role', 'tab');
-      slide.setAttribute('aria-selected', index === state.activeLineupIndex ? 'true' : 'false');
-      slide.setAttribute('tabindex', '0');
-      slide.setAttribute('data-index', index);
-      slide.setAttribute('data-cursor', 'CONFIGURE');
+      // 1. Create Dot Indicator
+      const dot = document.createElement('span');
+      dot.className = 'lineup-dot' + (index === 0 ? ' active' : '');
+      dot.setAttribute('data-index', index);
+      dot.addEventListener('click', () => {
+        scrollToLineupIndex(index);
+      });
+      dom.lineupDotsContainer.appendChild(dot);
 
-      // Swatches HTML
-      const swatchesHtml = bike.colors
-        .map((col) => `<span class="color-swatch" style="background-color: ${col};"></span>`)
-        .join('');
+      // 2. Create Card
+      const card = document.createElement('article');
+      card.className = 'lineup-card';
+      card.setAttribute('data-index', index);
+      card.setAttribute('data-cursor', 'EXPLORE');
 
-      // Specs HTML
-      const specsHtml = bike.specs
-        .map((sp) => `
-          <div class="spec-item">
-            <span class="spec-label">${sp.label}</span>
-            <span class="spec-val">${sp.value}</span>
-          </div>
-        `).join('');
-
-      slide.innerHTML = `
-        <!-- Collapsed Bar -->
-        <div class="slide-collapsed-bar">
-          <span class="slide-collapsed-num">${bike.number}</span>
-          <span class="slide-collapsed-title">${bike.name}</span>
-          <span class="slide-collapsed-indicator"></span>
+      const specsHtml = bike.specs.map((sp) => `
+        <div class="card-spec-item">
+          <span class="card-sp-label">${sp.label}</span>
+          <span class="card-sp-val">${sp.value}</span>
         </div>
+      `).join('');
 
-        <!-- Bike Image Layer -->
-        <div class="slide-image-stage">
-          <img class="slide-img" src="${bike.image}" alt="KTM ${bike.name}" loading="lazy">
+      const swatchesHtml = bike.colors.map((col) => `
+        <span class="card-swatch" style="background-color: ${col};"></span>
+      `).join('');
+
+      card.innerHTML = `
+        <div class="card-image-box">
+          <span class="card-num-badge">${bike.number} // FLEET</span>
+          <img class="card-img" src="${bike.image}" alt="KTM ${bike.name}" loading="lazy">
         </div>
-
-        <!-- Expanded Panel -->
-        <div class="slide-expanded-panel">
-          <div class="slide-info-top">
-            <div class="slide-num-badge">${bike.number} / ARCHIVE</div>
-            <h3 class="slide-name">${bike.name}</h3>
-            <p class="slide-tagline">${bike.tagline}</p>
+        <div class="card-content">
+          <div class="card-header-row">
+            <div>
+              <span class="card-series-tag">${bike.series}</span>
+              <h3 class="card-title">${bike.name}</h3>
+            </div>
+            <div class="card-swatches">
+              ${swatchesHtml}
+            </div>
           </div>
-
-          <div class="slide-bottom-bar">
-            <div class="slide-specs-grid">
-              ${specsHtml}
-            </div>
-
-            <div class="slide-swatches-and-cta">
-              <div class="color-swatches" aria-label="Color Options">
-                ${swatchesHtml}
-              </div>
-              <button class="slide-configure-btn" data-model="${bike.id}" data-cursor="RESERVE">
-                <span>Configure</span>
-                <span>&rarr;</span>
-              </button>
-            </div>
+          <p class="card-tagline">${bike.description}</p>
+          <div class="card-specs-row">
+            ${specsHtml}
+          </div>
+          <div class="card-footer-row">
+            <span class="card-status-pill">AVAILABLE FOR ALLOCATION</span>
+            <button class="card-cta-btn" data-model="${bike.id}" data-cursor="RESERVE">
+              <span>Configure Model</span>
+              <span>&rarr;</span>
+            </button>
           </div>
         </div>
       `;
 
-      // Event handlers
-      slide.addEventListener('click', () => {
-        setActiveLineupSlide(index);
-      });
-
-      // Desktop hover with debounce
-      slide.addEventListener('mouseenter', () => {
-        if (state.isMobile) return;
-        clearTimeout(state.lineupDebounceTimer);
-        state.lineupDebounceTimer = setTimeout(() => {
-          setActiveLineupSlide(index);
-        }, 80);
-      });
-
-      // Keyboard navigation
-      slide.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          setActiveLineupSlide(index);
-        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          e.preventDefault();
-          const next = (index + 1) % cfg.lineup.models.length;
-          focusLineupSlide(next);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          const prev = (index - 1 + cfg.lineup.models.length) % cfg.lineup.models.length;
-          focusLineupSlide(prev);
-        }
-      });
-
-      dom.lineupAccordion.appendChild(slide);
-    });
-
-    // Configure buttons delegate
-    dom.lineupAccordion.addEventListener('click', (e) => {
-      const btn = e.target.closest('.slide-configure-btn');
-      if (btn) {
+      card.querySelector('.card-cta-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        const modelId = btn.getAttribute('data-model');
-        openReservationModal(modelId);
-      }
+        openReservationModal(bike.id);
+      });
+
+      card.addEventListener('click', () => {
+        updateReservationPreview(bike.id);
+        openReservationModal(bike.id);
+      });
+
+      dom.horizontalTrack.appendChild(card);
     });
+
+    // Arrow buttons
+    if (dom.lineupPrevBtn) {
+      dom.lineupPrevBtn.addEventListener('click', () => {
+        const nextIdx = Math.max(0, state.activeLineupIndex - 1);
+        scrollToLineupIndex(nextIdx);
+      });
+    }
+
+    if (dom.lineupNextBtn) {
+      dom.lineupNextBtn.addEventListener('click', () => {
+        const nextIdx = Math.min(cfg.lineup.models.length - 1, state.activeLineupIndex + 1);
+        scrollToLineupIndex(nextIdx);
+      });
+    }
+
+    // Auto-Tour Button
+    if (dom.lineupAutoTourBtn) {
+      dom.lineupAutoTourBtn.addEventListener('click', toggleLineupTour);
+    }
   }
 
-  function setActiveLineupSlide(idx) {
-    state.activeLineupIndex = idx;
-    const slides = dom.lineupAccordion.querySelectorAll('.lineup-slide');
-    slides.forEach((sl, i) => {
-      if (i === idx) {
-        sl.classList.add('active');
-        sl.setAttribute('aria-selected', 'true');
-      } else {
-        sl.classList.remove('active');
-        sl.setAttribute('aria-selected', 'false');
-      }
-    });
+  function scrollToLineupIndex(index) {
+    if (!dom.lineupWrapper) return;
+    const total = cfg.lineup.models.length;
+    const targetProgress = index / (total - 1);
+    const scrollDist = dom.lineupWrapper.offsetHeight - state.viewportHeight;
+    const targetY = dom.lineupWrapper.offsetTop + targetProgress * scrollDist;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
   }
 
-  function focusLineupSlide(idx) {
-    setActiveLineupSlide(idx);
-    const slides = dom.lineupAccordion.querySelectorAll('.lineup-slide');
-    if (slides[idx]) slides[idx].focus();
-  }
+  function toggleLineupTour(e) {
+    if (e) e.stopPropagation();
+    state.lineupTourActive = !state.lineupTourActive;
 
-  /* ==========================================================================
-     9. NAVIGATION SCROLL SYSTEM
-     Hides on scroll down, reappears on scroll up. Updates active link.
-     ========================================================================== */
-  function updateNavbar() {
-    if (!dom.navbar) return;
-    const currentY = window.scrollY || window.pageYOffset;
-
-    // Scrolled background style
-    if (currentY > 60) {
-      dom.navbar.classList.add('nav-scrolled');
+    if (state.lineupTourActive) {
+      if (dom.lineupAutoTourBtn) dom.lineupAutoTourBtn.classList.add('active');
+      if (dom.lineupTourLabel) dom.lineupTourLabel.textContent = 'TOURING FLEET [STOP]';
+      clearInterval(state.lineupTourTimer);
+      state.lineupTourTimer = setInterval(() => {
+        const total = cfg.lineup.models.length;
+        const next = (state.activeLineupIndex + 1) % total;
+        scrollToLineupIndex(next);
+      }, cfg.rendering.lineupTourIntervalMs || 3400);
     } else {
-      dom.navbar.classList.remove('nav-scrolled');
+      if (dom.lineupAutoTourBtn) dom.lineupAutoTourBtn.classList.remove('active');
+      if (dom.lineupTourLabel) dom.lineupTourLabel.textContent = 'AUTO-TOUR ALL MODELS';
+      clearInterval(state.lineupTourTimer);
+    }
+  }
+
+  function updateHorizontalLineup() {
+    if (!dom.lineupWrapper || !dom.horizontalTrack || state.isMobile) return;
+    const rect = dom.lineupWrapper.getBoundingClientRect();
+    const scrollDist = dom.lineupWrapper.offsetHeight - state.viewportHeight;
+    const progress = clamp(-rect.top / scrollDist, 0, 1);
+    state.lineupProgress = progress;
+
+    if (dom.lineupHorizontalProgress) {
+      dom.lineupHorizontalProgress.style.width = (progress * 100).toFixed(2) + '%';
     }
 
-    // Scroll direction behavior
-    if (currentY > state.lastScrollY && currentY > 150) {
-      dom.navbar.classList.add('nav-hidden');
-    } else {
-      dom.navbar.classList.remove('nav-hidden');
+    const containerW = dom.horizontalTrackContainer.clientWidth;
+    const trackW = dom.horizontalTrack.scrollWidth;
+    const maxTranslate = Math.max(0, trackW - containerW + 128);
+    const currentTranslate = progress * maxTranslate;
+
+    dom.horizontalTrack.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
+
+    // Update active index & dots
+    const total = cfg.lineup.models.length;
+    const activeIdx = Math.min(total - 1, Math.round(progress * (total - 1)));
+    if (activeIdx !== state.activeLineupIndex) {
+      state.activeLineupIndex = activeIdx;
+      const dots = dom.lineupDotsContainer.querySelectorAll('.lineup-dot');
+      dots.forEach((dot, i) => {
+        if (i === activeIdx) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
     }
-
-    state.lastScrollY = currentY;
-
-    // Active Section Link Highlight
-    const sections = [
-      { id: 'hero', link: dom.navLinks[0] },
-      { id: 'engineering-statement', link: dom.navLinks[1] },
-      { id: 'dismantle', link: dom.navLinks[2] },
-      { id: 'lineup', link: dom.navLinks[3] }
-    ];
-
-    const scrollMid = currentY + state.viewportHeight * 0.4;
-    sections.forEach(({ id, link }) => {
-      const sec = document.getElementById(id);
-      if (!sec || !link) return;
-      const top = sec.offsetTop;
-      const bottom = top + sec.offsetHeight;
-      if (scrollMid >= top && scrollMid < bottom) {
-        dom.navLinks.forEach((l) => l.classList.remove('active'));
-        link.classList.add('active');
-      }
-    });
   }
 
   /* ==========================================================================
-     10. RESERVATION MODAL
-     ========================================================================== */
-  function initReservation() {
-    if (dom.reserveCta) {
-      dom.reserveCta.addEventListener('click', () => {
-        openReservationModal('duke-390');
-      });
-    }
-
-    if (dom.modalClose) {
-      dom.modalClose.addEventListener('click', closeReservationModal);
-    }
-
-    if (dom.modal) {
-      dom.modal.addEventListener('click', (e) => {
-        if (e.target === dom.modal) closeReservationModal();
-      });
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && dom.modal && dom.modal.classList.contains('open')) {
-        closeReservationModal();
-      }
-    });
-
-    if (dom.reservationForm) {
-      dom.reservationForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const model = document.getElementById('res-model').value;
-        const name = document.getElementById('res-name').value;
-        alert(`Thank you, ${name}!\n\nYour priority allocation request for the ${model.toUpperCase()} has been submitted to KTM Apexor Concierge.`);
-        closeReservationModal();
-        dom.reservationForm.reset();
-      });
-    }
-  }
-
-  function openReservationModal(modelId) {
-    if (!dom.modal) return;
-    const select = document.getElementById('res-model');
-    if (select && modelId) select.value = modelId;
-    dom.modal.classList.add('open');
-  }
-
-  function closeReservationModal() {
-    if (dom.modal) dom.modal.classList.remove('open');
-  }
-
-  /* ==========================================================================
-     10.5. TAP-TO-RUN & AUTOMATIC RUN ENGINE
-     Allows tapping on the motorcycle canvas or pills to run animations automatically.
+     9. TAP AUTO-RUN ENGINE
      ========================================================================== */
   function initTapAutoRun() {
-    // 1. Hero Canvas & Button Tapping
     function toggleHeroAutoRun(e) {
       if (e) e.stopPropagation();
       state.heroAutoRun = !state.heroAutoRun;
@@ -808,14 +714,10 @@
       }
     }
 
-    if (dom.heroAutoRunBtn) {
-      dom.heroAutoRunBtn.addEventListener('click', toggleHeroAutoRun);
-    }
-    if (dom.heroCanvas) {
-      dom.heroCanvas.addEventListener('click', toggleHeroAutoRun);
-    }
+    if (dom.heroAutoRunBtn) dom.heroAutoRunBtn.addEventListener('click', toggleHeroAutoRun);
+    if (dom.heroQuickAutoRunBtn) dom.heroQuickAutoRunBtn.addEventListener('click', toggleHeroAutoRun);
+    if (dom.heroCanvas) dom.heroCanvas.addEventListener('click', toggleHeroAutoRun);
 
-    // 2. Dismantle Canvas & Button Tapping
     function toggleDismantleAutoRun(e) {
       if (e) e.stopPropagation();
       const scrollDistance = dom.dismantleWrapper.offsetHeight - state.viewportHeight;
@@ -823,7 +725,6 @@
       const curScroll = window.scrollY || window.pageYOffset;
       const currentP = clamp((curScroll - disTop) / scrollDistance, 0, 1);
 
-      // Scroll to dismantle stage if not currently in view
       if (curScroll < disTop - 250 || curScroll > disTop + scrollDistance + 250) {
         window.scrollTo({ top: disTop + 10, behavior: 'smooth' });
       }
@@ -841,39 +742,9 @@
       if (dom.dismantleAutoRunBtn) dom.dismantleAutoRunBtn.classList.add('active');
     }
 
-    if (dom.dismantleAutoRunBtn) {
-      dom.dismantleAutoRunBtn.addEventListener('click', toggleDismantleAutoRun);
-    }
-    if (dom.dismantleCanvas) {
-      dom.dismantleCanvas.addEventListener('click', toggleDismantleAutoRun);
-    }
+    if (dom.dismantleAutoRunBtn) dom.dismantleAutoRunBtn.addEventListener('click', toggleDismantleAutoRun);
+    if (dom.dismantleCanvas) dom.dismantleCanvas.addEventListener('click', toggleDismantleAutoRun);
 
-    // 3. Lineup Auto-Tour Tapping
-    function toggleLineupTour(e) {
-      if (e) e.stopPropagation();
-      state.lineupTourActive = !state.lineupTourActive;
-
-      if (state.lineupTourActive) {
-        if (dom.lineupAutoTourBtn) dom.lineupAutoTourBtn.classList.add('active');
-        if (dom.lineupTourLabel) dom.lineupTourLabel.textContent = 'TOURING [TAP TO STOP]';
-        clearInterval(state.lineupTourTimer);
-        state.lineupTourTimer = setInterval(() => {
-          const total = cfg.lineup.models.length;
-          const next = (state.activeLineupIndex + 1) % total;
-          setActiveLineupSlide(next);
-        }, cfg.rendering.lineupTourIntervalMs || 3200);
-      } else {
-        if (dom.lineupAutoTourBtn) dom.lineupAutoTourBtn.classList.remove('active');
-        if (dom.lineupTourLabel) dom.lineupTourLabel.textContent = 'TAP TO AUTO-TOUR MODELS';
-        clearInterval(state.lineupTourTimer);
-      }
-    }
-
-    if (dom.lineupAutoTourBtn) {
-      dom.lineupAutoTourBtn.addEventListener('click', toggleLineupTour);
-    }
-
-    // Gracefully pause auto-run when user manually scrolls
     window.addEventListener('wheel', () => {
       if (state.heroAutoRun) {
         state.heroAutoRun = false;
@@ -907,10 +778,134 @@
   }
 
   /* ==========================================================================
-     11. MASTER RENDER & ANIMATION LOOP (60fps requestAnimationFrame)
+     10. NAVIGATION & FOOTER CLOCK
+     ========================================================================== */
+  function updateNavbar() {
+    if (!dom.navbar) return;
+    const currentY = window.scrollY || window.pageYOffset;
+
+    if (currentY > 60) dom.navbar.classList.add('nav-scrolled');
+    else dom.navbar.classList.remove('nav-scrolled');
+
+    if (currentY > state.lastScrollY && currentY > 150) dom.navbar.classList.add('nav-hidden');
+    else dom.navbar.classList.remove('nav-hidden');
+
+    state.lastScrollY = currentY;
+
+    const sections = [
+      { id: 'hero', link: dom.navLinks[0] },
+      { id: 'engineering-statement', link: dom.navLinks[1] },
+      { id: 'dismantle', link: dom.navLinks[2] },
+      { id: 'lineup', link: dom.navLinks[3] }
+    ];
+
+    const scrollMid = currentY + state.viewportHeight * 0.4;
+    sections.forEach(({ id, link }) => {
+      const sec = document.getElementById(id);
+      if (!sec || !link) return;
+      const top = sec.offsetTop;
+      const bottom = top + sec.offsetHeight;
+      if (scrollMid >= top && scrollMid < bottom) {
+        dom.navLinks.forEach((l) => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }
+
+  function initFooterClock() {
+    if (!dom.footerClock) return;
+    function updateClock() {
+      const now = new Date();
+      // Format time in Vienna / Austria timezone (KTM headquarters)
+      const options = { timeZone: 'Europe/Vienna', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      dom.footerClock.textContent = 'VIENNA TIME: ' + now.toLocaleTimeString('en-GB', options);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  }
+
+  /* ==========================================================================
+     11. RESERVATION SECTION & MODAL
+     ========================================================================== */
+  function initReservation() {
+    // Model selector tabs
+    if (dom.reservationTabs) {
+      dom.reservationTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          dom.reservationTabs.forEach((t) => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          const modelId = tab.getAttribute('data-model');
+          updateReservationPreview(modelId);
+        });
+      });
+    }
+
+    if (dom.reserveCta) {
+      dom.reserveCta.addEventListener('click', () => {
+        const activeTab = document.querySelector('.res-tab.active');
+        const modelId = activeTab ? activeTab.getAttribute('data-model') : 'duke-390';
+        openReservationModal(modelId);
+      });
+    }
+
+    if (dom.modalClose) {
+      dom.modalClose.addEventListener('click', closeReservationModal);
+    }
+
+    if (dom.modal) {
+      dom.modal.addEventListener('click', (e) => {
+        if (e.target === dom.modal) closeReservationModal();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dom.modal && dom.modal.classList.contains('open')) {
+        closeReservationModal();
+      }
+    });
+
+    if (dom.reservationForm) {
+      dom.reservationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const model = document.getElementById('res-model').value;
+        const name = document.getElementById('res-name').value;
+        alert(`Thank you, ${name}!\n\nYour priority allocation request for the ${model.toUpperCase()} has been submitted to KTM Apexor Concierge.`);
+        closeReservationModal();
+        dom.reservationForm.reset();
+      });
+    }
+  }
+
+  function updateReservationPreview(modelId) {
+    if (!dom.reservationPreviewImg) return;
+    const modelData = cfg.lineup.models.find((m) => m.id === modelId) || cfg.lineup.models[0];
+    dom.reservationPreviewImg.style.opacity = '0.4';
+    setTimeout(() => {
+      dom.reservationPreviewImg.src = modelData.image;
+      dom.reservationPreviewImg.style.opacity = '1';
+    }, 150);
+  }
+
+  function openReservationModal(modelId) {
+    if (!dom.modal) return;
+    const select = document.getElementById('res-model');
+    if (select && modelId) select.value = modelId;
+    dom.modal.classList.add('open');
+  }
+
+  function closeReservationModal() {
+    if (dom.modal) dom.modal.classList.remove('open');
+  }
+
+  /* ==========================================================================
+     12. MASTER TICK LOOP (60fps requestAnimationFrame)
      ========================================================================== */
   function tick() {
-    // Auto-Run Hero Progression
+    // Auto-Run Hero
     if (state.heroAutoRun && dom.heroWrapper) {
       const scrollDistance = dom.heroWrapper.offsetHeight - state.viewportHeight;
       const heroTop = dom.heroWrapper.offsetTop;
@@ -929,7 +924,7 @@
       window.scrollTo(0, newY);
     }
 
-    // Auto-Run Dismantle Progression
+    // Auto-Run Dismantle
     if (state.dismantleAutoRun && dom.dismantleWrapper) {
       const scrollDistance = dom.dismantleWrapper.offsetHeight - state.viewportHeight;
       const disTop = dom.dismantleWrapper.offsetTop;
@@ -957,14 +952,13 @@
       window.scrollTo(0, newY);
     }
 
-    // Smooth frame interpolation (lerp 0.15)
+    // Lerp Canvas Frames
     state.heroCurrentFrame = lerp(state.heroCurrentFrame, state.heroTargetFrame, cfg.rendering.lerpFactor);
     state.dismantleCurrentFrame = lerp(state.dismantleCurrentFrame, state.dismantleTargetFrame, cfg.rendering.lerpFactor);
 
     const roundedHero = Math.round(state.heroCurrentFrame);
     const roundedDismantle = Math.round(state.dismantleCurrentFrame);
 
-    // Redraw only when the rounded frame changes
     if (roundedHero !== state.heroLastRendered) {
       renderHeroCanvas(roundedHero);
     }
@@ -977,12 +971,13 @@
   }
 
   /* ==========================================================================
-     12. SCROLL & RESIZE LISTENERS
+     13. SCROLL & RESIZE LISTENERS
      ========================================================================== */
   function onScroll() {
     updateHeroSection();
     updateEngineeringStatement();
     updateDismantleSection();
+    updateHorizontalLineup();
     updateNavbar();
   }
 
@@ -994,7 +989,6 @@
     resizeCanvas(dom.heroCanvas);
     resizeCanvas(dom.dismantleCanvas);
 
-    // Force re-render with new canvas dimensions
     renderHeroCanvas(Math.round(state.heroCurrentFrame));
     renderDismantleCanvas(Math.round(state.dismantleCurrentFrame));
 
@@ -1005,33 +999,28 @@
      INITIALIZATION BOOTSTRAP
      ========================================================================== */
   function init() {
-    // 1. Setup canvases
     resizeCanvas(dom.heroCanvas);
     resizeCanvas(dom.dismantleCanvas);
 
-    // 2. Init components
     initFilmGrain();
     initCustomCursor();
     initEngineeringStatement();
-    initLineupAccordion();
+    initHorizontalLineup();
     initReservation();
     initTapAutoRun();
+    initFooterClock();
 
-    // 3. Bind events
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
 
-    // 4. Start preloader & render loop
     initPreloader();
     onScroll();
     requestAnimationFrame(tick);
   }
 
-  // Run on DOM content loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 })();
-

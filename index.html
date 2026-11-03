@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="KTM DUKE 390 — Midnight Racing Experience. A premium cinematic 3D scrollytelling motorcycle experience.">
+  <meta name="description" content="KTM DUKE 390 — Midnight Racing Experience. A premium cinematic 3D scrollytelling motorcycle experience inspired by modern automotive editorial design.">
   <title>KTM DUKE 390 — MIDNIGHT RACING EXPERIENCE | APEXOR</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body class="has-custom-cursor">
 
   <!-- =========================================================================
@@ -19,13 +16,13 @@
     <div class="preloader-content">
       <div class="preloader-brand">
         <span class="preloader-wordmark">APEXOR</span>
-        <span class="preloader-badge">DUKE 390 CINEMA</span>
+        <span class="preloader-badge">KTM DUKE 390 // CINEMA</span>
       </div>
       <div class="preloader-bar-wrap">
         <div id="preloader-bar" class="preloader-bar"></div>
       </div>
       <div class="preloader-meta">
-        <span id="preloader-status">INITIALIZING OPTICS</span>
+        <span id="preloader-status">INITIALIZING OPTICS & TELEMETRY</span>
         <span id="preloader-pct" class="preloader-pct">000%</span>
       </div>
     </div>
@@ -42,27 +39,34 @@
   </div>
 
   <!-- =========================================================================
-       NAVIGATION
+       FIXED EDITORIAL NAVIGATION
        ========================================================================= -->
   <header>
     <nav id="navbar" aria-label="Main Navigation">
       <div class="nav-brand">
         <a href="#hero" class="nav-wordmark" data-cursor="VIEW">APEXOR</a>
+        <span class="nav-divider">/</span>
         <span class="nav-submark">KTM DUKE 390</span>
+        <span class="nav-badge-live">● 60 FPS</span>
       </div>
+
       <ul class="nav-menu">
-        <li><a href="#hero" class="nav-link active" data-cursor="VIEW">Experience</a></li>
-        <li><a href="#engineering-statement" class="nav-link" data-cursor="VIEW">Engineering</a></li>
-        <li><a href="#dismantle" class="nav-link" data-cursor="VIEW">Architecture</a></li>
-        <li><a href="#lineup" class="nav-link" data-cursor="VIEW">Models</a></li>
+        <li><a href="#hero" class="nav-link active" data-cursor="VIEW"><span class="nav-link-num">01</span>Experience</a></li>
+        <li><a href="#engineering-statement" class="nav-link" data-cursor="VIEW"><span class="nav-link-num">02</span>Philosophy</a></li>
+        <li><a href="#dismantle" class="nav-link" data-cursor="VIEW"><span class="nav-link-num">03</span>Architecture</a></li>
+        <li><a href="#lineup" class="nav-link" data-cursor="VIEW"><span class="nav-link-num">04</span>Fleet</a></li>
       </ul>
-      <a href="#reservation" class="nav-cta" data-cursor="RESERVE">Reserve</a>
+
+      <div class="nav-actions">
+        <span class="nav-telemetry-badge">399 CC // 44 HP</span>
+        <a href="#reservation" class="nav-cta" data-cursor="RESERVE">Reserve</a>
+      </div>
     </nav>
   </header>
 
   <main>
     <!-- =======================================================================
-         SECTION 01: CINEMATIC HERO (600vh pinned)
+         SECTION 01: HERO EXPERIENCE (Scrolltide Asymmetrical Split to Cinema)
          ======================================================================= -->
     <section id="hero" class="hero-wrapper" aria-label="Cinematic Hero Experience">
       <div class="stage" id="hero-stage">
@@ -121,34 +125,71 @@
           </div>
         </aside>
 
-        <!-- Chapter Overlays -->
+        <!-- Chapter Overlays (Scrolltide Split Screen on Scene 1, then Fullscreen) -->
         <div class="hero-chapter-container">
-          <!-- Chapter 1 (0-18%) -->
-          <article id="chapter-1" class="hero-chapter chapter-01 active">
-            <h1 class="hero-title-main">APEXOR</h1>
-            <p class="hero-sub-text">The city is asleep.</p>
-            <div class="hero-scroll-prompt">
-              <span class="pulse-line"></span>
-              <span>TAP BIKE OR SCROLL TO RUN</span>
+          <!-- Chapter 1 (0-18%): Asymmetrical Opening Screen -->
+          <article id="chapter-1" class="hero-chapter chapter-split active">
+            <div class="split-left-panel">
+              <span class="hero-mono-tag">KTM MOTORCYCLE EXPERIENCE</span>
+              <h1 class="hero-split-headline">UNLEASH<br><span class="highlight-orange">THE DARK.</span></h1>
+              <p class="hero-split-description">
+                Forged for midnight asphalt. 399 cc of raw Austrian engineering piercing through the sleeping metropolis.
+              </p>
+              
+              <div class="hero-action-group">
+                <a href="#engineering-statement" class="hero-cta-btn" data-cursor="EXPLORE">
+                  <span>EXPLORE DUKE 390</span>
+                  <span class="btn-arrow">&rarr;</span>
+                </a>
+                <button id="hero-quick-autorun-btn" class="hero-secondary-btn" data-cursor="AUTO-RUN">
+                  <span>START AUTO-RUN</span>
+                  <span class="btn-icon">▶</span>
+                </button>
+              </div>
+
+              <div class="hero-telemetry-strip">
+                <div class="telemetry-pill">
+                  <span class="pill-label">ACCELERATION</span>
+                  <span class="pill-val">0–100 IN 4.8S</span>
+                </div>
+                <div class="telemetry-pill">
+                  <span class="pill-label">OUTPUT</span>
+                  <span class="pill-val">44.2 HP // 39 NM</span>
+                </div>
+                <div class="telemetry-pill">
+                  <span class="pill-label">CHASSIS</span>
+                  <span class="pill-val">STEEL TRELLIS</span>
+                </div>
+              </div>
+
+              <div class="hero-scroll-prompt">
+                <span class="pulse-line"></span>
+                <span>TAP BIKE OR SCROLL TO COMMENCE RIDE</span>
+              </div>
             </div>
           </article>
 
-          <!-- Chapter 2 (22-42%) -->
+          <!-- Chapter 2 (22-42%): Illumination Statement -->
           <article id="chapter-2" class="hero-chapter chapter-statement">
-            <h2 class="chapter-headline">It doesn't need the city's light.</h2>
+            <span class="chapter-badge">02 // ILLUMINATION</span>
+            <h2 class="chapter-headline">It doesn't need<br>the city's light.</h2>
+            <p class="chapter-supporting">Twin split-LED projectors cutting clean tunnels through midnight fog.</p>
           </article>
 
-          <!-- Chapter 3 (48-70%) -->
+          <!-- Chapter 3 (48-70%): Agility Statement -->
           <article id="chapter-3" class="hero-chapter chapter-statement">
-            <h2 class="chapter-headline">It brings its own.</h2>
+            <span class="chapter-badge">03 // PREDATOR AGILITY</span>
+            <h2 class="chapter-headline">It brings<br><span class="highlight-orange">its own.</span></h2>
+            <p class="chapter-supporting">Sculpted trellis architecture tuned for predatory cornering on wet streets.</p>
           </article>
 
-          <!-- Chapter 4 (78-95%) -->
+          <!-- Chapter 4 (78-95%): Hero Product Reveal -->
           <article id="chapter-4" class="hero-chapter chapter-04">
+            <span class="chapter-badge">04 // APEX MACHINE</span>
             <h2 class="chapter-product-title">DUKE 390</h2>
-            <p class="chapter-product-specs">399 CC · SINGLE CYLINDER · LIQUID COOLED</p>
+            <p class="chapter-product-specs">399 CC · 44.2 HP · SINGLE CYLINDER · LIQUID COOLED</p>
             <a href="#engineering-statement" class="chapter-product-link" data-cursor="VIEW">
-              <span>Discover the Duke</span>
+              <span>Explore Engineering Architecture</span>
               <span>&rarr;</span>
             </a>
           </article>
@@ -162,14 +203,41 @@
     </section>
 
     <!-- =======================================================================
-         SECTION 02: ENGINEERING STATEMENT (100vh)
+         SECTION 02: EDITORIAL ENGINEERING STATEMENT (100vh)
          ======================================================================= -->
     <section id="engineering-statement" aria-label="Engineering Philosophy">
       <div class="statement-inner">
-        <div class="statement-tag">02 — ENGINEERING</div>
+        <div class="statement-header-group">
+          <span class="statement-tag">02 — PHILOSOPHY</span>
+          <span class="statement-subtag">MINIMAL ARCHITECTURE / MAXIMUM INTENSITY</span>
+        </div>
+
         <blockquote class="statement-text" id="statement-words">
-          <!-- Words will be dynamically injected with scroll-driven opacity -->
+          <!-- Words dynamically injected with scroll-driven opacity -->
         </blockquote>
+
+        <div class="statement-metrics-grid">
+          <div class="metric-card">
+            <span class="metric-num">399</span>
+            <span class="metric-unit">CC</span>
+            <span class="metric-label">CYLINDER DISPLACEMENT</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-num">44.2</span>
+            <span class="metric-unit">HP</span>
+            <span class="metric-label">MAXIMUM POWER</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-num">39</span>
+            <span class="metric-unit">NM</span>
+            <span class="metric-label">PEAK TORQUE</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-num">165</span>
+            <span class="metric-unit">KG</span>
+            <span class="metric-label">WET READY TO RACE</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -182,8 +250,7 @@
 
         <!-- Tap-To-Dismantle Floating Indicator -->
         <div class="stage-tap-hud dismantle-tap-hud">
-          <button id="dismantle-autorun-btn" class="tap-autorun-pill" data-cursor="EXPLODE"
-            aria-label="Auto-dismantle animation">
+          <button id="dismantle-autorun-btn" class="tap-autorun-pill" data-cursor="EXPLODE" aria-label="Auto-dismantle animation">
             <span class="tap-pulse-dot"></span>
             <span id="dismantle-autorun-label">TAP BIKE TO DISMANTLE</span>
             <span id="dismantle-autorun-icon" class="autorun-icon">⤢</span>
@@ -191,8 +258,9 @@
         </div>
 
         <div class="dismantle-header-hud">
+          <span class="dismantle-tag">03 — ARCHITECTURE</span>
           <h2 class="dismantle-title">Look closer.</h2>
-          <div class="dismantle-subtitle">EXPLODED MECHANICAL ARCHITECTURE</div>
+          <div class="dismantle-subtitle">EXPLODED MECHANICAL DECONSTRUCTION</div>
         </div>
 
         <!-- Engineering Callouts (Revealed after 70% progress) -->
@@ -200,29 +268,33 @@
           <div id="callout-frame" class="callout align-left" style="top: 38%; left: 45%;">
             <div class="callout-dot"></div>
             <div class="callout-line"></div>
+            <span class="callout-badge">01 // STRUCTURAL</span>
             <span class="callout-title">FRAME</span>
-            <p class="callout-desc">Lightweight orange steel trellis frame.</p>
+            <p class="callout-desc">Lightweight orange steel trellis frame with bolt-on subframe.</p>
           </div>
 
           <div id="callout-engine" class="callout align-right" style="top: 60%; left: 48%;">
             <div class="callout-dot"></div>
             <div class="callout-line"></div>
+            <span class="callout-badge">02 // POWERTRAIN</span>
             <span class="callout-title">ENGINE</span>
-            <p class="callout-desc">Liquid-cooled single-cylinder engine.</p>
+            <p class="callout-desc">Liquid-cooled 399 cc single-cylinder with forged piston & ride-by-wire.</p>
           </div>
 
           <div id="callout-suspension" class="callout align-left" style="top: 32%; left: 66%;">
             <div class="callout-dot"></div>
             <div class="callout-line"></div>
+            <span class="callout-badge">03 // DAMPING</span>
             <span class="callout-title">SUSPENSION</span>
-            <p class="callout-desc">Precision-tuned WP suspension system.</p>
+            <p class="callout-desc">43mm WP APEX upside-down fork with 5-click adjustable damping.</p>
           </div>
 
           <div id="callout-light" class="callout align-right" style="top: 24%; left: 78%;">
             <div class="callout-dot"></div>
             <div class="callout-line"></div>
+            <span class="callout-badge">04 // OPTICS</span>
             <span class="callout-title">LIGHT</span>
-            <p class="callout-desc">Aggressive LED headlight signature.</p>
+            <p class="callout-desc">Aggressive twin-projector LED headlight signature.</p>
           </div>
         </div>
 
@@ -233,58 +305,170 @@
       </div>
     </section>
 
-    <!-- =======================================================================
-         SECTION 04: MOTORCYCLE LINEUP (100vh interactive vertical accordion)
-         ======================================================================= -->
-    <section id="lineup" aria-label="Motorcycle Lineup">
-      <div class="lineup-header">
-        <div class="lineup-header-row">
-          <div class="lineup-header-titles">
-            <span class="lineup-tag">03 — THE LINEUP</span>
-            <h2 class="lineup-headline">Five ways to own the road.</h2>
-          </div>
-          <button id="lineup-autotour-btn" class="lineup-autotour-pill" data-cursor="TOUR"
-            aria-label="Auto-tour all models">
-            <span class="tap-pulse-dot"></span>
-            <span id="lineup-tour-label">TAP TO AUTO-TOUR MODELS</span>
-            <span id="lineup-tour-icon" class="autorun-icon">▶</span>
-          </button>
+    <!-- Expandable Engineering Deep-Dive Grid -->
+    <section class="engineering-deepdive-section" aria-label="Component Deep Dive">
+      <div class="deepdive-inner">
+        <div class="deepdive-header">
+          <span class="deepdive-tag">TECHNICAL DEEP DIVE</span>
+          <h3 class="deepdive-title">Bred in Mattighofen. Refined in the Shadows.</h3>
         </div>
-      </div>
 
-      <div class="lineup-accordion" id="lineup-accordion" role="tablist" aria-label="KTM Model Accordion">
-        <!-- Slides generated dynamically from config.js -->
+        <div class="deepdive-grid">
+          <article class="deepdive-card" data-cursor="EXPAND">
+            <span class="deepdive-category">POWERTRAIN</span>
+            <h4 class="deepdive-card-title">Next-Gen LC4c Engine</h4>
+            <p class="deepdive-card-desc">Redesigned cylinder head, larger airbox, and optimised catalytic converter deliver razor-sharp throttle response.</p>
+            <div class="deepdive-meta">399 CC // 4-VALVE DOHC</div>
+          </article>
+
+          <article class="deepdive-card" data-cursor="EXPAND">
+            <span class="deepdive-category">CHASSIS</span>
+            <h4 class="deepdive-card-title">Curved Cast Swingarm</h4>
+            <p class="deepdive-card-desc">Directly linked to the off-center rear shock absorber, clearing room for a larger underbelly exhaust system.</p>
+            <div class="deepdive-meta">GRAVITY DIE-CAST ALLOY</div>
+          </article>
+
+          <article class="deepdive-card" data-cursor="EXPAND">
+            <span class="deepdive-category">ERGONOMICS</span>
+            <h4 class="deepdive-card-title">Dual Seat Height Geometry</h4>
+            <p class="deepdive-card-desc">Standard 820 mm seat height with an optional 800 mm low setting gives the rider uncompromising control.</p>
+            <div class="deepdive-meta">820 MM // 800 MM OPTION</div>
+          </article>
+
+          <article class="deepdive-card" data-cursor="EXPAND">
+            <span class="deepdive-category">AVIONICS</span>
+            <h4 class="deepdive-card-title">5-Inch Bonded Glass TFT</h4>
+            <p class="deepdive-card-desc">Optical bonding eliminates glare while providing turn-by-turn navigation, lap timer, and Supermoto ABS toggle.</p>
+            <div class="deepdive-meta">CORNERING ABS // SUPERMOTO</div>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         SECTION 05: RESERVATION (100vh)
+         SECTION 04: HORIZONTAL SCROLLING SHOWCASE & GALLERY (Scrolltide Inspired)
+         ======================================================================= -->
+    <section id="lineup" class="horizontal-lineup-wrapper" aria-label="Motorcycle Lineup Gallery">
+      <div class="lineup-sticky-stage">
+        
+        <!-- Header & Nav Controls -->
+        <div class="lineup-top-bar">
+          <div class="lineup-titles">
+            <span class="lineup-tag">04 — THE FLEET</span>
+            <h2 class="lineup-headline">Five ways to own the road.</h2>
+          </div>
+
+          <div class="lineup-controls-group">
+            <button id="lineup-prev-btn" class="lineup-nav-arrow" aria-label="Previous model" data-cursor="PREV">&larr;</button>
+            <div class="lineup-dots-indicator" id="lineup-dots"></div>
+            <button id="lineup-next-btn" class="lineup-nav-arrow" aria-label="Next model" data-cursor="NEXT">&rarr;</button>
+            
+            <button id="lineup-autotour-btn" class="lineup-autotour-pill" data-cursor="TOUR" aria-label="Auto-tour models">
+              <span class="tap-pulse-dot"></span>
+              <span id="lineup-tour-label">AUTO-TOUR ALL MODELS</span>
+              <span class="autorun-icon">▶</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal Track -->
+        <div class="horizontal-track-container" id="horizontal-track-container">
+          <div class="horizontal-track" id="horizontal-track">
+            <!-- Cards generated dynamically via config.js -->
+          </div>
+        </div>
+
+        <!-- Bottom progress bar for horizontal scroll -->
+        <div class="stage-progress-track">
+          <div id="lineup-horizontal-progress" class="stage-progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SECTION 05: CINEMATIC FULL-WIDTH FEATURE BAND (Scrolltide Editorial Band)
+         ======================================================================= -->
+    <section id="feature-band" class="editorial-feature-band" aria-label="Cinematic Showcase">
+      <div class="feature-band-bg"></div>
+      <div class="feature-band-inner">
+        <span class="feature-mono-tag">05 // MIDNIGHT CANYON</span>
+        <h2 class="feature-headline">ENGINEERED TO CUT THE NIGHT.</h2>
+        <p class="feature-body">
+          Zero excess. Pure mechanical aggression. The midnight street isn't a route—it's your territory.
+          With ride-by-wire precision and cornering MTC, every apex belongs to you.
+        </p>
+
+        <div class="feature-spec-strip">
+          <div class="spec-pill">
+            <span class="sp-num">RIDE MODES</span>
+            <span class="sp-desc">STREET · RAIN · TRACK</span>
+          </div>
+          <div class="spec-pill">
+            <span class="sp-num">WP APEX</span>
+            <span class="sp-desc">43 MM OPEN CARTRIDGE</span>
+          </div>
+          <div class="spec-pill">
+            <span class="sp-num">BYBRE RADIAL</span>
+            <span class="sp-desc">320 MM DISC // 4-PISTON</span>
+          </div>
+          <div class="spec-pill">
+            <span class="sp-num">SUPERMOTO ABS</span>
+            <span class="sp-desc">REAR WHEEL SLIP ENABLED</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SECTION 06: RESERVATION & ACQUISITION PORTAL (100vh)
          ======================================================================= -->
     <section id="reservation" aria-label="Reservation Portal">
       <div class="reservation-inner">
-        <span class="reservation-badge">04 — ACQUISITION</span>
+        <span class="reservation-badge">06 — ACQUISITION PORTAL</span>
         <h2 class="reservation-headline">Own the night.</h2>
-        <p class="reservation-subtext">Precision engineering. Unmistakable presence. Pure KTM attitude.</p>
+        <p class="reservation-subtext">
+          Precision engineering. Unmistakable presence. Pure KTM attitude.
+          Select your machine and secure priority allocation from the Mattighofen skunkworks.
+        </p>
+
+        <!-- Model Selector Tabs -->
+        <div class="reservation-model-tabs" role="tablist" aria-label="Choose motorcycle model">
+          <button class="res-tab active" data-model="duke-390" role="tab" aria-selected="true" data-cursor="SELECT">DUKE 390</button>
+          <button class="res-tab" data-model="duke-250" role="tab" aria-selected="false" data-cursor="SELECT">DUKE 250</button>
+          <button class="res-tab" data-model="duke-200" role="tab" aria-selected="false" data-cursor="SELECT">DUKE 200</button>
+          <button class="res-tab" data-model="rc-390" role="tab" aria-selected="false" data-cursor="SELECT">RC 390</button>
+          <button class="res-tab" data-model="adventure-390" role="tab" aria-selected="false" data-cursor="SELECT">ADVENTURE 390</button>
+        </div>
+
+        <!-- Live Model Preview Image -->
+        <div class="reservation-preview-frame">
+          <img id="reservation-preview-img" src="assets/bikes/duke-390.webp" alt="Selected KTM Duke Model" loading="lazy">
+        </div>
+
         <button id="reserve-cta" class="reservation-cta-btn" data-cursor="RESERVE">
-          <span>RESERVE YOUR DUKE</span>
+          <span>RESERVE YOUR ALLOCATION</span>
         </button>
       </div>
     </section>
   </main>
 
   <!-- =========================================================================
-       FOOTER
+       EDITORIAL FOOTER
        ========================================================================= -->
   <footer id="footer">
     <div class="footer-top">
       <div class="footer-brand">
         <span class="footer-wordmark">APEXOR</span>
         <span class="footer-tag">KTM DUKE 390 · MIDNIGHT RACING EXPERIENCE</span>
+        <div class="footer-telemetry">
+          <span>MATTIGHOFEN HQ: 48.0062° N, 13.1492° E</span>
+          <span id="footer-clock">VIENNA TIME: --:--:--</span>
+        </div>
       </div>
 
       <div class="footer-cols">
         <div class="footer-col">
-          <span class="footer-col-title">MODELS</span>
+          <span class="footer-col-title">FLEET</span>
           <a href="#lineup" data-cursor="OPEN">Duke 390</a>
           <a href="#lineup" data-cursor="OPEN">Duke 250</a>
           <a href="#lineup" data-cursor="OPEN">Duke 200</a>
@@ -295,15 +479,14 @@
         <div class="footer-col">
           <span class="footer-col-title">ENGINEERING</span>
           <a href="#engineering-statement" data-cursor="OPEN">Philosophy</a>
-          <a href="#dismantle" data-cursor="OPEN">Architecture</a>
-          <a href="#dismantle" data-cursor="OPEN">Components</a>
-          <a href="#hero" data-cursor="OPEN">Aesthetics</a>
+          <a href="#dismantle" data-cursor="OPEN">Exploded Architecture</a>
+          <a href="#dismantle" data-cursor="OPEN">LC4c Powertrain</a>
+          <a href="#feature-band" data-cursor="OPEN">Chassis Dynamics</a>
         </div>
 
         <div class="footer-col">
           <span class="footer-col-title">CONNECT</span>
-          <a href="https://www.instagram.com/ktm_official/" target="_blank" rel="noopener"
-            data-cursor="OPEN">Instagram</a>
+          <a href="https://www.instagram.com/ktm_official/" target="_blank" rel="noopener" data-cursor="OPEN">Instagram</a>
           <a href="https://www.ktm.com/" target="_blank" rel="noopener" data-cursor="OPEN">Global Portal</a>
           <a href="#reservation" data-cursor="RESERVE">Contact Concierge</a>
           <a href="#" data-cursor="OPEN">Legal & Privacy</a>
@@ -313,7 +496,7 @@
 
     <div class="footer-bottom">
       <span>&copy; 2026 APEXOR · KTM AG. ALL RIGHTS RESERVED.</span>
-      <span>DESIGNED FOR MIDNIGHT RIDERS</span>
+      <span>DESIGNED FOR MIDNIGHT RIDERS // SCROLLTIDE EDITORIAL ARCHITECTURE</span>
     </div>
   </footer>
 
@@ -323,7 +506,7 @@
   <div id="reservation-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 id="modal-title" class="modal-title">RESERVE DUKE 390</h3>
+        <h3 id="modal-title" class="modal-title">PRIORITY ALLOCATION</h3>
         <button id="modal-close" class="modal-close-btn" aria-label="Close modal">&times;</button>
       </div>
 
@@ -331,11 +514,11 @@
         <div class="form-group">
           <label for="res-model" class="form-label">SELECTED MODEL</label>
           <select id="res-model" class="form-select" required>
-            <option value="duke-390" selected>KTM DUKE 390 — 399 CC</option>
-            <option value="duke-250">KTM DUKE 250 — 249 CC</option>
-            <option value="duke-200">KTM DUKE 200 — 199 CC</option>
-            <option value="rc-390">KTM RC 390 — 373 CC</option>
-            <option value="adventure-390">KTM ADVENTURE 390 — 373 CC</option>
+            <option value="duke-390" selected>KTM DUKE 390 — 399 CC // THE CORNER ROCKET</option>
+            <option value="duke-250">KTM DUKE 250 — 249 CC // URBAN AGGRESSION</option>
+            <option value="duke-200">KTM DUKE 200 — 199 CC // SATIN BRUTE</option>
+            <option value="rc-390">KTM RC 390 — 373 CC // MOTO3 DNA</option>
+            <option value="adventure-390">KTM ADVENTURE 390 — 373 CC // TOURING</option>
           </select>
         </div>
 
@@ -354,7 +537,7 @@
           <input type="text" id="res-city" class="form-input" placeholder="Enter delivery region" required>
         </div>
 
-        <button type="submit" class="form-submit-btn">SUBMIT ALLOCATION REQUEST</button>
+        <button type="submit" class="form-submit-btn">CONFIRM ALLOCATION REQUEST</button>
       </form>
     </div>
   </div>
@@ -363,5 +546,4 @@
   <script src="config.js"></script>
   <script src="main.js"></script>
 </body>
-
 </html>
